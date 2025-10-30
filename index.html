@@ -720,6 +720,101 @@ document.addEventListener('DOMContentLoaded', function() {
                 font-size: 1.8rem;
             }
         }
+        /* GitHub Database Status Styles */
+.github-status {
+  background: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border: 1px solid #f1d8e6;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #f1d8e6;
+}
+
+.status-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.status-label {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.status-value {
+  color: #4b2b39;
+}
+
+.status-value.connected {
+  color: #27ae60;
+}
+
+.status-value.error {
+  color: #e74c3c;
+}
+
+.github-config-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.github-config-content {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.github-config-content h3 {
+  margin-top: 0;
+  color: #4b2b39;
+}
+
+.github-config-content input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #f1d8e6;
+  border-radius: 8px;
+  font-family: inherit;
+}
+
+.github-config-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,111,181,0.3);
+  border-radius: 50%;
+  border-top-color: var(--accent);
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
     </style>
 </head>
 <body>
@@ -728,7 +823,361 @@ document.addEventListener('DOMContentLoaded', function() {
         <p>For Sagnik & Taneesha — A collection of our precious memories</p>
     </div> -->
 <br><br><br>
+<!-- GitHub Database Status -->
+<section style="margin-bottom:20px; display: none;" id="github-db-section">
+  <h2 style="font-size:18px;margin-bottom:8px">Cloud Storage Status</h2>
+  <div id="github-status" class="github-status">
+    <div class="status-item">
+      <span class="status-label">Repository:</span>
+      <span id="repo-status" class="status-value">Not configured</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Images Synced:</span>
+      <span id="sync-status" class="status-value">0</span>
+    </div>
+    <button id="setup-github" class="btn" style="margin-top:10px">Configure GitHub Sync</button>
+  </div>
+</section>
+
     <div class="album-container">
+
+<script type="text/javascript">
+  
+  /* ---------- Photo Album Book with GitHub Sync ---------- */
+class PhotoAlbum {
+    constructor() {
+        this.currentPage = 1;
+        this.totalPages = 10;
+        this.photosPerPage = 4;
+        this.photos = [];
+        this.ALBUM_KEY = 'love-scrapbook-album';
+        this.GITHUB_KEY = 'github-config';
+        this.bookOpen = false;
+        this.githubConfig = null;
+        
+        this.init();
+    }
+
+    init() {
+        this.createPages();
+        this.loadPhotos();
+        this.loadGitHubConfig();
+        this.createPageIndicators();
+        this.updateNavigation();
+        this.setupEventListeners();
+        this.renderPhotos();
+        this.updateGitHubStatus();
+    }
+
+    loadGitHubConfig() {
+        const saved = localStorage.getItem(this.GITHUB_KEY);
+        if (saved) {
+            this.githubConfig = JSON.parse(saved);
+            document.getElementById('github-db-section').style.display = 'block';
+        }
+    }
+
+    saveGitHubConfig(config) {
+        this.githubConfig = config;
+        localStorage.setItem(this.GITHUB_KEY, JSON.stringify(config));
+        document.getElementById('github-db-section').style.display = 'block';
+        this.updateGitHubStatus();
+    }
+
+    async updateGitHubStatus() {
+        if (!this.githubConfig) return;
+        
+        const repoStatus = document.getElementById('repo-status');
+        const syncStatus = document.getElementById('sync-status');
+        
+        repoStatus.textContent = `${this.githubConfig.repo}`;
+        repoStatus.className = 'status-value connected';
+        
+        // Count photos that are synced to GitHub
+        const syncedPhotos = this.photos.filter(photo => photo.githubUrl).length;
+        syncStatus.textContent = `${syncedPhotos}/${this.photos.length}`;
+    }
+
+    setupEventListeners() {
+        // Existing event listeners...
+        document.getElementById('book-cover').addEventListener('click', () => {
+            this.openBook();
+        });
+        
+        document.getElementById('prev-page').addEventListener('click', () => this.prevPage());
+        document.getElementById('next-page').addEventListener('click', () => this.nextPage());
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') this.prevPage();
+            if (e.key === 'ArrowRight') this.nextPage();
+        });
+
+        // File upload
+        document.getElementById('album-file').addEventListener('change', (e) => {
+            this.handleFileUpload(e.target.files);
+            e.target.value = ''; // Reset input
+        });
+
+        // Clear album
+        document.getElementById('clear-album').addEventListener('click', () => {
+            if (confirm('Clear all photos from the album?')) {
+                this.photos = [];
+                this.savePhotos();
+                this.renderPhotos();
+                this.updateStats();
+                this.showFeedback('All photos cleared from album');
+                this.updateGitHubStatus();
+            }
+        });
+
+        // GitHub setup
+        document.getElementById('setup-github').addEventListener('click', () => {
+            this.showGitHubConfigModal();
+        });
+    }
+
+    showGitHubConfigModal() {
+        const modal = document.createElement('div');
+        modal.className = 'github-config-modal';
+        modal.style.display = 'flex';
+        
+        modal.innerHTML = `
+            <div class="github-config-content">
+                <h3>Configure GitHub Sync</h3>
+                <p style="color: var(--muted); font-size: 14px; margin-bottom: 20px;">
+                    Store your photos on GitHub to access them from any device.
+                </p>
+                
+                <div>
+                    <label for="github-token">GitHub Personal Access Token:</label>
+                    <input type="password" id="github-token" placeholder="ghp_..." 
+                           value="${this.githubConfig ? this.githubConfig.token : ''}">
+                    <small style="color: var(--muted); display: block; margin-top: 5px;">
+                        Create a token with "repo" permissions at <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a>
+                    </small>
+                </div>
+                
+                <div>
+                    <label for="github-repo">Repository (username/repo):</label>
+                    <input type="text" id="github-repo" placeholder="username/repository" 
+                           value="${this.githubConfig ? this.githubConfig.repo : ''}">
+                    <small style="color: var(--muted); display: block; margin-top: 5px;">
+                        The repository where photos will be stored
+                    </small>
+                </div>
+                
+                <div class="github-config-buttons">
+                    <button id="test-github" class="btn" style="flex:1">Test Connection</button>
+                    <button id="save-github" class="btn" style="flex:1">Save</button>
+                    <button id="cancel-github" class="btn ghost" style="flex:1">Cancel</button>
+                </div>
+                
+                <div id="github-test-result" style="margin-top: 15px; min-height: 20px;"></div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Event listeners for modal
+        document.getElementById('test-github').addEventListener('click', () => {
+            this.testGitHubConnection(modal);
+        });
+        
+        document.getElementById('save-github').addEventListener('click', () => {
+            this.saveGitHubConfigFromModal(modal);
+        });
+        
+        document.getElementById('cancel-github').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        });
+    }
+
+    async testGitHubConnection(modal) {
+        const token = document.getElementById('github-token').value.trim();
+        const repo = document.getElementById('github-repo').value.trim();
+        const resultDiv = document.getElementById('github-test-result');
+        
+        if (!token || !repo) {
+            resultDiv.innerHTML = '<span style="color:#e74c3c">Please fill in all fields</span>';
+            return;
+        }
+        
+        resultDiv.innerHTML = '<span class="loading-spinner"></span> Testing connection...';
+        
+        try {
+            const response = await fetch(`https://api.github.com/repos/${repo}`, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (response.ok) {
+                resultDiv.innerHTML = '<span style="color:#27ae60">✓ Connection successful! Repository found.</span>';
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('GitHub test failed:', error);
+            resultDiv.innerHTML = `<span style="color:#e74c3c">Connection failed: ${error.message}</span>`;
+        }
+    }
+
+    saveGitHubConfigFromModal(modal) {
+        const token = document.getElementById('github-token').value.trim();
+        const repo = document.getElementById('github-repo').value.trim();
+        
+        if (!token || !repo) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        this.saveGitHubConfig({ token, repo });
+        document.body.removeChild(modal);
+        this.showFeedback('GitHub configuration saved!');
+        
+        // Auto-sync existing photos
+        this.syncPhotosToGitHub();
+    }
+
+    async syncPhotosToGitHub() {
+        if (!this.githubConfig) return;
+        
+        const unsyncedPhotos = this.photos.filter(photo => !photo.githubUrl);
+        if (unsyncedPhotos.length === 0) return;
+        
+        this.showFeedback(`Syncing ${unsyncedPhotos.length} photos to GitHub...`);
+        
+        let syncedCount = 0;
+        
+        for (const photo of unsyncedPhotos) {
+            try {
+                const githubUrl = await this.uploadToGitHub(photo);
+                if (githubUrl) {
+                    photo.githubUrl = githubUrl;
+                    syncedCount++;
+                }
+            } catch (error) {
+                console.error('Failed to sync photo:', error);
+            }
+        }
+        
+        this.savePhotos();
+        this.updateGitHubStatus();
+        
+        if (syncedCount > 0) {
+            this.showFeedback(`Successfully synced ${syncedCount} photos to GitHub!`);
+        }
+    }
+
+    async uploadToGitHub(photo) {
+        if (!this.githubConfig) return null;
+        
+        const { token, repo } = this.githubConfig;
+        
+        // Generate a unique filename
+        const timestamp = new Date().getTime();
+        const randomId = Math.random().toString(36).substring(2, 10);
+        const filename = `photo-${timestamp}-${randomId}.jpg`;
+        
+        // Convert base64 to blob for GitHub
+        const base64Data = photo.data.split(',')[1];
+        const content = btoa(base64Data);
+        
+        const response = await fetch(`https://api.github.com/repos/${repo}/contents/images/${filename}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `Add photo: ${photo.caption}`,
+                content: content,
+                branch: 'main'
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            return result.content.download_url;
+        } else {
+            throw new Error(`GitHub upload failed: ${response.status}`);
+        }
+    }
+
+    async handleFileUpload(files) {
+        if (files.length === 0) return;
+        
+        let uploadedCount = 0;
+        const totalFiles = files.length;
+        
+        for (const file of files) {
+            // Check if file is an image
+            if (!file.type.startsWith('image/')) {
+                this.showFeedback('Please select image files only');
+                continue;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const nextPage = this.getNextAvailablePage();
+                const photo = {
+                    data: e.target.result,
+                    caption: this.generateCaption(file.name),
+                    date: Date.now(),
+                    page: nextPage,
+                    githubUrl: null // Will be set after GitHub upload
+                };
+                
+                this.photos.unshift(photo);
+                uploadedCount++;
+                
+                // Try to upload to GitHub if configured
+                if (this.githubConfig) {
+                    try {
+                        photo.githubUrl = await this.uploadToGitHub(photo);
+                    } catch (error) {
+                        console.error('GitHub upload failed, storing locally only:', error);
+                    }
+                }
+                
+                if (uploadedCount === totalFiles) {
+                    this.savePhotos();
+                    this.renderPhotos();
+                    this.updateStats();
+                    this.updateGitHubStatus();
+                    
+                    let message = `Added ${uploadedCount} photo${uploadedCount > 1 ? 's' : ''} to page ${nextPage}!`;
+                    if (this.githubConfig) {
+                        message += ' (Synced to GitHub)';
+                    }
+                    
+                    this.showFeedback(message);
+                    
+                    // Auto-navigate to the page where photos were added
+                    this.goToPage(nextPage);
+                    
+                    // Open book if not already open
+                    this.openBook();
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Keep all other existing methods (createPages, loadPhotos, etc.) the same
+    // ... (rest of your existing PhotoAlbum class methods)
+}
+</script>
         <!-- Photo Album Book Section -->
         <section class="album-section">
             <div class="book-container">
