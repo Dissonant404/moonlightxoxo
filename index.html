@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -7,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Great+Vibes&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#fff0f6;
+      --bg:#FFB8F7;
       --card:#ffeef8;
       --accent:#ff6fb5;
       --accent-2:#ff9fc1;
@@ -257,35 +258,111 @@
       }
     }
 
+
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <div class="heart">💖</div>
-      <div>
-        <h1>Our Love Scrapbook</h1>
-        <p>For Sagnik &amp; Taneesha — little moments, big feelings</p>
-      </div>
-    </div>
-    <div class="meta">
-      <div class="small">Made with ❤️ — customize anything</div>
-    </div>
-  </header>
 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const video = document.getElementById('bgVideo');
+  if(video) {
+    video.play().catch(e => {
+      console.log('Video play failed:', e);
+    });
+  }
+});
+</script>
+<header>
+  <div class="logo">
+    <!-- <div class="heart">💖</div> -->
+    <div>
+      <h1>Our Love Scrapbook</h1>
+      <p>For Taneesha 💖</p> 
+    </div>
+  </div>
+</header>
+
+<style>
+  /* Updated Header Styles */
+  header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+
+  .logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo .heart {
+    font-family: 'Great Vibes', cursive;
+    font-size: 48px;
+    color: #ff6fb5;
+  }
+
+  .logo h1 {
+    font-family: 'Great Vibes', cursive;
+    font-size: 3.5rem;
+    color: #8a1145;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .logo p {
+    font-family: 'Great Vibes', cursive;
+    font-size: 1.8rem;
+    color: #8b5e6b;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .logo h1 {
+      font-size: 2.8rem;
+    }
+    
+    .logo p {
+      font-size: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .logo h1 {
+      font-size: 2.2rem;
+    }
+    
+    .logo p {
+      font-size: 1.2rem;
+    }
+    
+    .logo .heart {
+      font-size: 36px;
+    }
+  }
+</style>
+ <br> <br> <br>
   <div class="container">
     <main class="main">
 
       <!-- Countdown -->
       <section style="margin-bottom:18px">
-        <h2 style="font-size:18px;margin-bottom:8px">Countdown until we meet</h2>
+        <h2 style="font-size:25px;margin-bottom:8px">Countdown until we meet</h2>
         <div class="countdown" id="countdown">
           <div class="box"><div id="d">0</div><div class="small">Days</div></div>
           <div class="box"><div id="h">0</div><div class="small">Hours</div></div>
           <div class="box"><div id="m">0</div><div class="small">Minutes</div></div>
           <div class="box"><div id="s">0</div><div class="small">Seconds</div></div>
         </div>
-        <div class="small" style="margin-top:8px">Target date: <strong>December 22, 2025 — 23:59</strong> (changeable in script)</div>
+        <!-- <div class="small" style="margin-top:8px">Target date: <strong>December 22, 2025 — 23:59</strong> (changeable in script)</div> -->
       </section>
 
 
@@ -650,7 +727,7 @@
         <h1>Our Love Scrapbook</h1>
         <p>For Sagnik & Taneesha — A collection of our precious memories</p>
     </div> -->
-
+<br><br><br>
     <div class="album-container">
         <!-- Photo Album Book Section -->
         <section class="album-section">
@@ -658,8 +735,8 @@
                 <div class="book">
                     <!-- Book Cover -->
                     <div class="book-cover" id="book-cover">
-                        <h2>Our Memories</h2>
-                        <p>A journey through our love story</p>
+                        <h2>Our Album</h2>
+                        <!-- <p>A journey through our love story</p> -->
                         <p class="subtitle">Sagnik & Taneesha</p>
                         <p style="margin-top: 30px; font-size: 16px;">Click to open our album</p>
                     </div>
@@ -1194,7 +1271,7 @@
     margin-bottom: 15px !important;
   }
 </style>
-
+<br><br><br>
 <!-- Updated HTML for video calls section -->
 <section class="snapshots-section">
   <h2 style="font-size:20px;margin-bottom:15px">Snapshots from our video calls</h2>
@@ -1305,8 +1382,8 @@
       <section style="margin-bottom:20px">
         <h2 style="font-size:18px;margin-bottom:8px">Snapshots of our dates</h2>
         <div class="coming-soon">
-          <h3 style="margin:0 0 8px 0">Dates gallery — Coming soon</h3>
-          <p>We're preparing a special layout for our date-night memories (map pins, little notes, and ribbons). Uploads are supported — they'll appear here once the feature is enabled.</p>
+          <h3 style="margin:0 0 8px 0">It's coming soon babe 😊</h3>
+        <!--   <p>We're preparing a special layout for our date-night memories (map pins, little notes, and ribbons). Uploads are supported — they'll appear here once the feature is enabled.</p> -->
         </div>
       </section>
 
