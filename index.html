@@ -1571,6 +1571,28 @@ When things get tough, remember I will always want to be with you; I'll support 
   </div>
 </section>
 
+ <!-- Letter 2 -->
+    <div class="envelope closed" onclick="toggleEnvelope(this)">
+      <div class="envelope-flap"></div>
+      <div class="envelope-seal">💌</div>
+      <div class="envelope-preview">
+        Click to open this love letter...
+      </div>
+      <div class="envelope-content">
+        <div class="letter-header">Dear Taneesha,</div>
+        <div class="letter-content">
+42 days till I can feel your soft touch and smell that favorite cologne of yours. That's like 6 weeks. A week in here passes by in the blink of an eye. I just need to blink 6 times. The moment feels so near babe. The excitement inside me feels surreal to physically lay my eyes upon that gorgeous face of yours. Did you know? from today to the day we meet is the same number of days I would be there with you? Now that sounds like a lot of days because we for a fact are gonna make the most out of them. 
+
+I for a fact know that I won't change a single thing in our 3 months journey. This LDR brought me much closer to you than ever. Every moment between us, whether it be through text or our nightly calls, I got to know you better and love you deeper. It was all possible because we kept our communication sparklingly alive and I wish it continues like that. I miss you every second of the day, but I'm grateful that I have someone truly special in my heart that I miss, and shed light that I can look forward to seeing her, then make the most of our togetherness after meeting her. 
+
+You are the only one who I wouldn't losing my sleep for, wouldn't get tired over, makes my next day a whole lot better. You are the one I would seek comfort to after a bad day because it feels a safe and secure space near you. Thank you for being there for me babe. Deep in my heart, I will always be grateful for our unforgettable moments and they are more to come.
+        </div>
+        <div class="letter-footer">Love, Sagnik</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Add this JavaScript to your existing script -->
 <script>
   function toggleEnvelope(envelope) {
@@ -2182,11 +2204,56 @@ When things get tough, remember I will always want to be with you; I'll support 
 
 
 
+<script type="text/javascript">
+  
+  // Source - https://stackoverflow.com/questions/23681325/convert-canvas-to-pdf
+// Posted by Fr3d
+// Retrieved 2025-11-06, License - CC BY-SA 3.0
+
+var canvas = document.getElementById('myCanvas');
+var context = canvas.getContext('2d');
+
+// draw a blue cloud
+context.beginPath();
+context.moveTo(170, 80);
+context.bezierCurveTo(130, 100, 130, 150, 230, 150);
+context.bezierCurveTo(250, 180, 320, 180, 340, 150);
+context.bezierCurveTo(420, 150, 420, 120, 390, 100);
+context.bezierCurveTo(430, 40, 370, 30, 340, 50);
+context.bezierCurveTo(320, 5, 250, 20, 250, 50);
+context.bezierCurveTo(200, 5, 150, 20, 170, 80);
+context.closePath();
+context.lineWidth = 5;
+context.fillStyle = '#8ED6FF';
+context.fill();
+context.strokeStyle = '#0000ff';
+context.stroke();
+
+download.addEventListener("click", function() {
+  // only jpeg is supported by jsPDF
+  var imgData = canvas.toDataURL("image/jpeg", 1.0);
+  var pdf = new jsPDF();
+
+  pdf.addImage(imgData, 'JPEG', 0, 0);
+  pdf.save("download.pdf");
+}, false);
 
 
+
+
+</script>
+<!--
+Source - https://stackoverflow.com/questions/23681325/convert-canvas-to-pdf
+Posted by Fr3d
+Retrieved 2025-11-06, License - CC BY-SA 3.0
+-->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+
+
+<canvas id="myCanvas" width="578" height="200"></canvas>
+<button id="download">download</button>
 
 
 
 </html>
-
-
